@@ -1,0 +1,8 @@
+base_data <- Surveywikidata20120109
+is.na(base_data)
+library(summarytools)
+summarytools::dfSummary(base_data)
+
+library(mvnormalTest)
+mvnormalTest::mardia(base_data, std = "TRUE")
+mvnormalTest::msw(base_data)
