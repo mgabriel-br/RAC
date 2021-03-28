@@ -1,8 +1,34 @@
-base_data <- Surveywikidata20120109
-is.na(base_data)
+#read the Excel file and convert into a database
+database <- Surveywikidata20120109
+#check missing data
+is.na(database)
+#summarize data (descriptive statistics)
 library(summarytools)
-summarytools::dfSummary(base_data)
-
+summarytools::dfSummary(database)
+#test univariate and multivariate normality
 library(mvnormalTest)
-mvnormalTest::mardia(base_data, std = "TRUE")
-mvnormalTest::msw(base_data)
+mvnormalTest::mardia(database, std = "TRUE")
+mvnormalTest::msw(database)
+#defining and assessing the structural equation modeling
+library(cSEM)
+#define measurement model
+model <- '
+AR =~ AR1 + AR2
+COM =~ COM1 + COM2 + COM3 + COM4
+PT =~ PT1 + PT2 + PT3
+FC =~ FC1 + FC2 + FC3
+SE =~ SE1 + SE2 + SE3
+PU =~ PU1 + PU2 + PU3 + PU4
+SN =~ SN1 + SN2
+PBC =~ PBC1 + PBC2 + PBC3
+BI =~ BI1 + BI2 + BI3
+#define structural model
+PU ~ AR + COM + PT
+PBC ~ FC + SE
+BI ~ PU + SN + PBC
+'
+#syntax to calculate the structural equation model, as defined previously
+result <- csem(.data = database, .model = model, .resample_method = "bootstrap", .disattenuate = FALSE, .R = 5000, .sign_change_option = "individual")
+#summary and assessment of structural equation model results
+summarized <- summarize(result)
+assessed <- assess(result)
